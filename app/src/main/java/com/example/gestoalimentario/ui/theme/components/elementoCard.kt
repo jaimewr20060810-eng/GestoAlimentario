@@ -106,6 +106,7 @@ private fun ElementoCardPreview() {
     elementoCard(
         modifier = Modifier.fillMaxWidth(),
         elemento = Receta(
+            id=1,
             nombre = "Leche",
             categoria = "Lácteos",
             fecha_compra = "25/09/2026",

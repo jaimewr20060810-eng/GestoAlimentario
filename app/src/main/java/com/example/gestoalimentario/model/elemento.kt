@@ -7,6 +7,7 @@ object  Estado{
 
 data class Receta (
 
+    val id: Long,
     val nombre: String,
     val categoria: String,
     val fecha_compra: String,
