@@ -17,7 +17,6 @@ import com.example.gestoalimentario.ui.theme.screen.CompraScreen
 import com.example.gestoalimentario.ui.theme.screen.PerfilScreen
 import com.example.gestoalimentario.ui.theme.screen.ElementoFormScreen
 import com.example.gestoalimentario.ui.theme.screen.ElementoDetalleScreen
-
 object Rutas {
 
     const val HOME = "home"

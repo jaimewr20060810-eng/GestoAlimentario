@@ -1,38 +1,38 @@
-
 package com.example.gestoalimentario.ui.theme.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.gestoalimentario.model.Estado
 import com.example.gestoalimentario.model.Receta
+import com.example.gestoalimentario.ui.theme.validacion.ElementoFormValidar
 
 @Composable
 fun ElementoFormScreen(
     modifier: Modifier = Modifier,
-    elementoInicial: Receta?,
+    elementoInicial: Receta? = null,
     onSaveClick: (Receta) -> Unit,
     onCancelarClick: () -> Unit
 ) {
@@ -60,32 +60,18 @@ fun ElementoFormScreen(
 
     var estadoIndex by remember {
         mutableIntStateOf(
-            estadoOptions.indexOf(elementoInicial?.estado)
-                .coerceAtLeast(0)
+            estadoOptions.indexOf(elementoInicial?.estado).coerceAtLeast(0)
         )
     }
 
-    var errorNombre by remember {
-        mutableStateOf<String?>(null)
-    }
-
-    var errorCategoria by remember {
-        mutableStateOf<String?>(null)
-    }
-
-    var errorFechaCompra by remember {
-        mutableStateOf<String?>(null)
-    }
-
-    var errorFechaCaducidad by remember {
-        mutableStateOf<String?>(null)
+    var error by remember {
+        mutableStateOf("")
     }
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+            .padding(16.dp)
     ) {
 
         Text(
@@ -93,169 +79,148 @@ fun ElementoFormScreen(
                 "Añadir alimento"
             else
                 "Editar alimento",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.headlineMedium
         )
 
+        Spacer(modifier = Modifier.height(24.dp))
+
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
             value = nombre,
             onValueChange = {
                 nombre = it
-                errorNombre = null
+                error = ""
             },
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Nombre del alimento") },
-            isError = errorNombre != null,
-            supportingText = {
-                errorNombre?.let {
-                    Text(it, color = MaterialTheme.colorScheme.error)
-                }
-            },
             singleLine = true
         )
 
+        Spacer(modifier = Modifier.height(24.dp))
+
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
             value = categoria,
             onValueChange = {
                 categoria = it
-                errorCategoria = null
+                error = ""
             },
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Categoría") },
-            isError = errorCategoria != null,
-            supportingText = {
-                errorCategoria?.let {
-                    Text(it, color = MaterialTheme.colorScheme.error)
-                }
-            },
             singleLine = true
         )
 
+        Spacer(modifier = Modifier.height(24.dp))
+
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
             value = fechaCompra,
             onValueChange = {
                 fechaCompra = it
-                errorFechaCompra = null
+                error = ""
             },
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Fecha de compra (dd/mm/aaaa)") },
-            isError = errorFechaCompra != null,
-            supportingText = {
-                errorFechaCompra?.let {
-                    Text(it, color = MaterialTheme.colorScheme.error)
-                }
-            },
             singleLine = true
         )
 
+        Spacer(modifier = Modifier.height(24.dp))
+
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
             value = fechaCaducidad,
             onValueChange = {
                 fechaCaducidad = it
-                errorFechaCaducidad = null
+                error = ""
             },
+            modifier = Modifier.fillMaxWidth(),
             label = { Text("Fecha de caducidad (dd/mm/aaaa)") },
-            isError = errorFechaCaducidad != null,
-            supportingText = {
-                errorFechaCaducidad?.let {
-                    Text(it, color = MaterialTheme.colorScheme.error)
-                }
-            },
             singleLine = true
         )
+
+        Spacer(modifier = Modifier.height(32.dp))
 
         Text(
             text = "Estado del alimento",
             style = MaterialTheme.typography.titleMedium
         )
 
+        Spacer(modifier = Modifier.height(12.dp))
+
         SingleChoiceSegmentedButtonRow(
             modifier = Modifier.fillMaxWidth()
         ) {
-            estadoOptions.forEachIndexed { index, label ->
+            estadoOptions.forEachIndexed { index, estado ->
+
                 SegmentedButton(
-                    shape = SegmentedButtonDefaults.itemShape(
-                        index = index,
-                        count = estadoOptions.size
-                    ),
+                    selected = estadoIndex == index,
                     onClick = {
                         estadoIndex = index
                     },
-                    selected = index == estadoIndex,
-                    label = {
-                        Text(label)
-                    }
-                )
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = estadoOptions.size
+                    )
+                ) {
+                    Text(estado)
+                }
             }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        if (error.isNotEmpty()) {
+            Text(
+                text = error,
+                color = MaterialTheme.colorScheme.error
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(
-                8.dp,
-                Alignment.End
-            )
+            horizontalArrangement = Arrangement.End
         ) {
 
-            TextButton(
+            OutlinedButton(
                 onClick = onCancelarClick
             ) {
                 Text("Cancelar")
             }
 
+            Spacer(modifier = Modifier.padding(4.dp))
+
             Button(
                 onClick = {
 
-                    errorNombre = if (nombre.isBlank())
-                        "El nombre es obligatorio"
-                    else null
+                    val resultado = ElementoFormValidar.validar(
+                        nombre,
+                        categoria,
+                        fechaCompra,
+                        fechaCaducidad
+                    )
 
-                    errorCategoria = if (categoria.isBlank())
-                        "La categoría es obligatoria"
-                    else null
+                    if (resultado != null) {
 
-                    errorFechaCompra = if (fechaCompra.isBlank())
-                        "Introduce la fecha de compra"
-                    else null
+                        error = resultado
 
-                    errorFechaCaducidad = if (fechaCaducidad.isBlank())
-                        "Introduce la fecha de caducidad"
-                    else null
+                    } else {
 
-                    if (
-                        errorNombre == null &&
-                        errorCategoria == null &&
-                        errorFechaCompra == null &&
-                        errorFechaCaducidad == null
-                    ) {
+                        error = ""
 
-                        onSaveClick(
-                            Receta(
-                                id = elementoInicial?.id ?: 0L,
-                                nombre = nombre.trim(),
-                                categoria = categoria.trim(),
-                                fecha_compra = fechaCompra.trim(),
-                                fecha_caducado = fechaCaducidad.trim(),
-                                estado = estadoOptions[estadoIndex]
-                            )
+                        // Crear el alimento
+                        val nuevoElemento = Receta(
+                            id = elementoInicial?.id ?: 0L,
+                            nombre = nombre.trim(),
+                            categoria = categoria.trim(),
+                            fecha_compra = fechaCompra.trim(),
+                            fecha_caducado = fechaCaducidad.trim(),
+                            estado = estadoOptions[estadoIndex]
                         )
+
+                        onSaveClick(nuevoElemento)
                     }
-                }
+                },
+                shape = RoundedCornerShape(24.dp)
             ) {
                 Text("Guardar")
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ElementoFormScreenPreview() {
-    ElementoFormScreen(
-        modifier = Modifier.fillMaxSize(),
-        elementoInicial = null,
-        onSaveClick = {},
-        onCancelarClick = {}
-    )
 }
